@@ -18,3 +18,4 @@ tests/xxhash.h
 tests/xxhash.c
 tests/words.txt
 nul
+test_*.txt

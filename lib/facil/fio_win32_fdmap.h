@@ -256,8 +256,8 @@ static inline int fio_win_ioctl(int fd, long cmd, u_long *argp) {
 }
 #define ioctl fio_win_ioctl
 
-/* Override unlink (Unix sockets use file paths, no-op on Windows) */
-#define unlink(path) (-1)
+/* unlink — MinGW provides this; it works for regular files.
+   Only Unix socket paths would fail, but fio_unix_socket handles that. */
 
 #endif /* _WIN32 */
 #endif /* FIO_WIN32_FDMAP_H */
