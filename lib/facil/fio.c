@@ -17,6 +17,10 @@ Feel free to copy, use and enjoy according to the license provided.
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+
+#ifdef _WIN32
+#include <fio_win32.h>
+#else
 #include <pthread.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -35,6 +39,7 @@ Feel free to copy, use and enjoy according to the license provided.
 #include <sys/wait.h>
 
 #include <arpa/inet.h>
+#endif
 
 #if HAVE_OPENSSL
 #include <openssl/bio.h>
@@ -571,7 +576,12 @@ OVERRIDE THIS to replace the default `fork` implementation.
 Behaves like the system's `fork`.
 */
 #pragma weak fio_fork
+#ifndef _WIN32
 int __attribute__((weak)) fio_fork(void) { return fork(); }
+#else
+/* Windows doesn't have fork — return error to indicate single-process mode */
+int __attribute__((weak)) fio_fork(void) { errno = ENOTSUP; return -1; }
+#endif
 
 /**
  * OVERRIDE THIS to replace the default pthread implementation.
@@ -2606,7 +2616,13 @@ Internal socket flushing related functions
 
 #endif
 
-static void fio_sock_perform_close_fd(intptr_t fd) { close(fd); }
+static void fio_sock_perform_close_fd(intptr_t fd) {
+#ifdef _WIN32
+  closesocket((SOCKET)fd);
+#else
+  close(fd);
+#endif
+}
 
 static inline void fio_sock_packet_rotate_unsafe(uintptr_t fd) {
   fio_packet_s *packet = fd_data(fd).packet;
