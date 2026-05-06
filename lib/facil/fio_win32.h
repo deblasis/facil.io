@@ -273,10 +273,10 @@ static inline int fio_win_kill(pid_t pid, int sig) {
 
 /* ioctl — NOTE: overridden by fio_win32_fdmap.h for fd translation */
 
-/* fchmod — not available on Windows, no-op */
+/* fchmod — limited on Windows, best-effort via _chsize or no-op */
 static inline int fchmod(int fd, unsigned int mode) {
     (void)fd; (void)mode;
-    return 0; /* no-op on Windows */
+    return 0; /* Windows file permissions work differently */
 }
 
 /* pread — Windows doesn't have pread, use ReadFile with OVERLAPPED */

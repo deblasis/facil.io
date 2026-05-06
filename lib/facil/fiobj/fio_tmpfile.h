@@ -21,6 +21,10 @@ License: MIT
 static inline int fio_tmpfile(void) {
   // create a temporary file to contain the data.
   int fd = 0;
+#ifdef _WIN32
+  char name_template[] = "facil_io_tmpfile_XXXXXXXX";
+  fd = mkstemp(name_template);
+#else
 #ifdef P_tmpdir
   if (P_tmpdir[sizeof(P_tmpdir) - 1] == '/') {
     char name_template[] = P_tmpdir "facil_io_tmpfile_XXXXXXXX";
@@ -32,6 +36,7 @@ static inline int fio_tmpfile(void) {
 #else
   char name_template[] = "/tmp/facil_io_tmpfile_XXXXXXXX";
   fd = mkstemp(name_template);
+#endif
 #endif
   return fd;
 }
