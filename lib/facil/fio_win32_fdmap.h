@@ -219,6 +219,10 @@ static inline int fio_win_send(int sockfd, const void *buf, size_t len, int flag
 }
 #define send fio_win_send
 
+/* read()/write() are not overridden via #define to avoid conflicts with
+   struct field names. Instead, fio_hooks_default_read/write in fio.c use
+   recv()/send() on Windows. */
+
 /* Override WSAPoll (the poll wrapper from fio_win32.h) to translate fds */
 #undef poll
 static inline int fio_win_poll_translated(struct pollfd *fds, unsigned long nfds, int timeout) {
